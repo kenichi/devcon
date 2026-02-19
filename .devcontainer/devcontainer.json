@@ -1,0 +1,20 @@
+{
+  "name": "devcon",
+  "dockerComposeFile": ["compose.yml"],
+  "service": "devcon",
+  "forwardPorts": [6000, 6001],
+  "initializeCommand": "printf 'UID=%s\nGID=%s\nUSER=%s\n' \"$(id -u)\" \"$(id -g)\" \"$(id -u -n)\" > .devcontainer/.env",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "expertlsp.expert",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  },
+  "workspaceFolder": "/workspaces/devcon"
+}

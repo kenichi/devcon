@@ -1,0 +1,62 @@
+ARG ELIXIR_VERSION=1.19.5
+ARG OTP_VERSION=28.3.1
+ARG DEBIAN_VERSION=trixie-20260202-slim
+ARG BASE_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+
+FROM ${BASE_IMAGE} AS base
+
+RUN apt-get update -y && \
+    apt-get install -y build-essential curl git inotify-tools procps
+
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh && \
+    bash nodesource_setup.sh && \
+    apt-get install -yqq nodejs
+
+RUN npm install -g npm
+
+FROM base AS local
+
+ARG USER=vscode
+ARG UID=1000
+ARG GID=1000
+ARG PROJECT_DIR=project
+
+RUN groupadd -f --gid ${GID} ${USER} && \
+    useradd --uid ${UID} --gid ${GID} -m -s /bin/bash ${USER}
+
+RUN mkdir -p /workspaces/${PROJECT_DIR}/assets/node_modules \
+             /workspaces/${PROJECT_DIR}/_build \
+             /workspaces/${PROJECT_DIR}/deps \
+             /var/lib/claude && \
+    chown -R ${UID}:${GID} /workspaces/${PROJECT_DIR} /var/lib/claude
+
+COPY --from=antonmedv/fx:latest /bin/fx /usr/local/bin/fx
+
+RUN curl -sL -o \
+      /usr/local/bin/tidewave \
+      https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-$(uname -m)-unknown-linux-gnu && \
+    chmod +x /usr/local/bin/tidewave
+
+USER ${USER}
+
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+RUN mkdir -p /home/${USER}/.local/npm && \
+    echo "prefix=/home/${USER}/.local/npm" >> /home/${USER}/.npmrc && \
+    echo "export PATH=\$PATH:/home/${USER}/.local/npm/bin" >> /home/${USER}/.bashrc && \
+    mkdir -p /var/lib/claude/.claude && \
+    echo '{}' > /var/lib/claude/.claude.json && \
+    ln -s /var/lib/claude/.claude /home/${USER}/.claude && \
+    ln -s /var/lib/claude/.claude.json /home/${USER}/.claude.json && \
+    npm install -g @anthropic-ai/claude-code@latest
+
+RUN --mount=type=secret,id=OBAN_LICENSE_KEY,mode=0444 \
+    mix hex.repo add oban https://repo.oban.pro \
+      --fetch-public-key SHA256:4/OSKi0NRF91QVVXlGAhb/BIMLnK8NHcx/EWs+aIWPc \
+      --auth-key "$(cat /run/secrets/OBAN_LICENSE_KEY)"
+
+RUN echo 'set editing-mode vi' >> /home/${USER}/.inputrc
+ENV ERL_AFLAGS="-kernel shell_history enabled"
+
+WORKDIR /workspaces/${PROJECT_DIR}
