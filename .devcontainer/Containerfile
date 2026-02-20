@@ -10,18 +10,14 @@ RUN apt-get update -y && \
 
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh && \
     bash nodesource_setup.sh && \
-    apt-get install -yqq nodejs
-
-RUN npm install -g npm
+    apt-get install -yqq nodejs && \
+    npm install -g npm
 
 FROM base AS local
 
 RUN mkdir -p /workspaces/${PROJECT_DIR}/assets/node_modules \
              /workspaces/${PROJECT_DIR}/_build \
-             /workspaces/${PROJECT_DIR}/deps \
-             /var/lib/claude
-
-COPY --from=antonmedv/fx:latest /bin/fx /usr/local/bin/fx
+             /workspaces/${PROJECT_DIR}/deps
 
 RUN curl -sL -o \
       /usr/local/bin/tidewave \
@@ -31,21 +27,10 @@ RUN curl -sL -o \
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-RUN mkdir -p ${HOME}/.local/npm && \
-    echo "prefix=${HOME}/.local/npm" >> ${HOME}/.npmrc && \
-    echo "export PATH=\$PATH:${HOME}/.local/npm/bin" >> ${HOME}/.bashrc && \
-    mkdir -p /var/lib/claude/.claude && \
-    echo '{}' > /var/lib/claude/.claude.json && \
-    ln -s /var/lib/claude/.claude ${HOME}/.claude && \
-    ln -s /var/lib/claude/.claude.json ${HOME}/.claude.json && \
-    npm install -g @anthropic-ai/claude-code@latest
-
 RUN --mount=type=secret,id=OBAN_LICENSE_KEY,mode=0444 \
     mix hex.repo add oban https://repo.oban.pro \
       --fetch-public-key SHA256:4/OSKi0NRF91QVVXlGAhb/BIMLnK8NHcx/EWs+aIWPc \
       --auth-key "$(cat /run/secrets/OBAN_LICENSE_KEY)"
 
-RUN echo 'set editing-mode vi' >> ${HOME}/.inputrc
 ENV ERL_AFLAGS="-kernel shell_history enabled"
-
 WORKDIR /workspaces/${PROJECT_DIR}

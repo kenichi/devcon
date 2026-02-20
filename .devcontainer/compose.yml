@@ -29,18 +29,12 @@ services:
     init: true
     ports:
       - 127.0.0.1:6000:6000
+      - 127.0.0.1:7000:7000
     volumes:
       - ..:/workspaces/devcon
       - assets_node_modules:/workspaces/devcon/assets/node_modules
       - build:/workspaces/devcon/_build
       - deps:/workspaces/devcon/deps
-      - claude:/var/lib/claude
-
-  playwright:
-    command: cli.js --headless --browser=chromium --no-sandbox --port=8931 --host=0.0.0.0 --allowed-hosts='*'
-    entrypoint: node
-    image: mcr.microsoft.com/playwright/mcp:latest
-    init: true
 
   postgres:
     environment:
@@ -61,4 +55,3 @@ volumes:
   build:
   deps:
   pgdata:
-  claude:

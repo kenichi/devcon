@@ -2,7 +2,7 @@
   "name": "devcon",
   "dockerComposeFile": ["compose.yml"],
   "service": "devcon",
-  "forwardPorts": [6000, 6001],
+  "forwardPorts": [6000, 6001, 7000],
   "customizations": {
     "vscode": {
       "extensions": [
