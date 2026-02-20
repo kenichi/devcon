@@ -24,6 +24,7 @@ Default extensions are in `devcontainer.json`:
 * ms-vscode-remote.remote-containers
 * expertlsp.expert
 * bradlc.vscode-tailwindcss
+* anthropic.claude-code
 
 ## Oban Pro
 
