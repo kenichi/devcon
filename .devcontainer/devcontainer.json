@@ -3,7 +3,6 @@
   "dockerComposeFile": ["compose.yml"],
   "service": "devcon",
   "forwardPorts": [6000, 6001],
-  "initializeCommand": "printf 'UID=%s\nGID=%s\nUSER=%s\n' \"$(id -u)\" \"$(id -g)\" \"$(id -u -n)\" > .devcontainer/.env",
   "customizations": {
     "vscode": {
       "extensions": [

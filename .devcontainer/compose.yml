@@ -12,10 +12,7 @@ services:
   devcon:
     build:
       args:
-        GID: ${GID}
         PROJECT_DIR: devcon
-        UID: ${UID}
-        USER: ${USER}
       dockerfile: ./Containerfile
       secrets:
         - OBAN_LICENSE_KEY
