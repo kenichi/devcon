@@ -91,3 +91,13 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# Configure Tidewave
+config :tidewave,
+  plug: [
+    allow_remote_access: true,
+    team: [
+      id: "id",
+      token: "token"
+    ]
+  ]

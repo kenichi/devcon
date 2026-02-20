@@ -31,7 +31,9 @@ The `Containerfile` adds the Oban Pro hex repo; however, this repo has an empty 
 
 ## Tidewave
 
-The `Containerfile` also includes [Tidewave CLI](https://hexdocs.pm/tidewave/installation.html#cli).
+[Tidewave MCP](https://github.com/tidewave-ai/tidewave_phoenix) is included and configured. You can connect Claude Code by following their [directions](https://hexdocs.pm/tidewave/mcp_claude_code.html).
+
+The `Containerfile` also includes [Tidewave CLI](https://hexdocs.pm/tidewave/installation.html#cli). Example config in `config/dev.exs`. However, with valid credentials I could not get this connect. I attempted both localhost (http vs https error) and forwarded (github.dev redirect) URLs. PRs welcome if you get this working.
 
 ## See Also
 
